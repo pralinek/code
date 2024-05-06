@@ -31,3 +31,13 @@ var options = {
     }
 };
 var timeline = new vis.Timeline(container, items, options);
+
+
+tooltipOnItemUpdateTime: function(item, callback) {
+    var startTime = item.start;
+    var endTime = item.end;
+    var formattedStartTime = startTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    var formattedEndTime = endTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    var tooltipContent = '<div>Start Time: ' + formattedStartTime + '</div><div>End Time: ' + formattedEndTime + '</div>';
+    callback(tooltipContent);
+}
