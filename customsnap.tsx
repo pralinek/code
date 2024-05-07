@@ -41,3 +41,16 @@ tooltipOnItemUpdateTime: function(item, callback) {
     var tooltipContent = '<div>Start Time: ' + formattedStartTime + '</div><div>End Time: ' + formattedEndTime + '</div>';
     callback(tooltipContent);
 }
+
+const options = {
+    groupOrder: 'content',
+    onDrop: function (item, target, callback) {
+      // Check if the target group is the blocked group
+      if (target.group.className === 'blocked-group') {
+        // If it is the blocked group, cancel the drop action
+        callback(null);
+        return;
+      }
+      // Otherwise, allow the drop action
+      callback(item);
+    }
