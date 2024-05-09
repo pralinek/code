@@ -21,20 +21,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const GroupItem = ({ groupName, onRemove }) => {
-  const classes = useStyles();
 
+Certainly! Here's the GroupItem component using only Tailwind CSS for styling:
+
+jsx
+Copy code
+import React from 'react';
+
+const GroupItem = ({ groupName, onRemove }) => {
   return (
-    <div className={classes.groupItem}>
-      <div className={classes.flex}>
-        <CheckIcon color="primary" />
-        <Typography variant="body1" color="textPrimary">
-          {groupName}
-        </Typography>
+    <div className="group-item flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-4">
+      <div className="flex items-center">
+        <div className="w-6 h-6 rounded-full bg-green-500 flex justify-center items-center text-white mr-2">
+          ✓
+        </div>
+        <div className="text-gray-800">{groupName}</div>
       </div>
-      <IconButton className={classes.iconButton} onClick={onRemove}>
-        <DeleteIcon />
-      </IconButton>
+      <button
+        onClick={onRemove}
+        className="text-red-500 hover:text-red-700 focus:outline-none"
+      >
+        🗑️
+      </button>
     </div>
   );
 };
