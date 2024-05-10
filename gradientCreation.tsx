@@ -1,9 +1,9 @@
 function createShiftGradient(shiftStart, shiftEnd, breaks) {
     // Calculate the length of the shift period
-    const shiftLength = shiftEnd - shiftStart;
+    const shiftLength = shiftEnd.getTime() - shiftStart.getTime();
 
     // Calculate the length of each break period
-    const breakLengths = breaks.map(b => b[1] - b[0]);
+    const breakLengths = breaks.map(b => b.end.getTime() - b.start.getTime());
 
     // Find the longest break period
     const longestBreak = Math.max(...breakLengths);
@@ -17,12 +17,12 @@ function createShiftGradient(shiftStart, shiftEnd, breaks) {
     ];
 
     breaks.forEach(breakPeriod => {
-        const breakStart = breakPeriod[0];
-        const breakEnd = breakPeriod[1];
-        const breakPosition = (breakStart - shiftStart) / shiftLength * 100 + '%';
+        const breakStart = breakPeriod.start.getTime();
+        const breakEnd = breakPeriod.end.getTime();
+        const breakPosition = (breakStart - shiftStart.getTime()) / shiftLength * 100 + '%';
         colorStops.push({ color: 'red', position: breakPosition });
 
-        const breakEndPosition = (breakEnd - shiftStart) / shiftLength * 100 + '%';
+        const breakEndPosition = (breakEnd - shiftStart.getTime()) / shiftLength * 100 + '%';
         colorStops.push({ color: 'green', position: breakEndPosition });
     });
 
