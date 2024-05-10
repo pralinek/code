@@ -29,3 +29,15 @@ function createShiftGradient(shiftStart, shiftEnd, breaks) {
         const breakEndPosition = breakEndMoment.diff(shiftStartMoment) / shiftLength * 100 + '%';
         colorStops.push({ color: 'green', position: breakEndPosition });
     });
+
+    // Construct the gradient string
+    let gradientString = 'linear-gradient(to right';
+    colorStops.forEach(stop => {
+        gradientString += `, ${stop.color} ${stop.position}`;
+    });
+    gradientString += ')';
+
+    // Apply the gradient to the element
+    const element = document.getElementById('shift-gradient');
+    element.style.background = gradientString;
+}
