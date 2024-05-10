@@ -35,5 +35,5 @@ function createShiftGradient(shiftStart, shiftEnd, breaks) {
 
     // Apply the gradient to the element
     const element = document.getElementById('shift-gradient');
-    element.style.backgroundImage = gradientString;
+    element.style.background = gradientString;
 }
