@@ -1,9 +1,13 @@
 function createShiftGradient(shiftStart, shiftEnd, breaks) {
+    // Convert shift start and end to Moment objects
+    const shiftStartMoment = moment(shiftStart);
+    const shiftEndMoment = moment(shiftEnd);
+
     // Calculate the length of the shift period
-    const shiftLength = shiftEnd.getTime() - shiftStart.getTime();
+    const shiftLength = shiftEndMoment.diff(shiftStartMoment);
 
     // Calculate the length of each break period
-    const breakLengths = breaks.map(b => b.end.getTime() - b.start.getTime());
+    const breakLengths = breaks.map(b => moment(b.end).diff(moment(b.start)));
 
     // Find the longest break period
     const longestBreak = Math.max(...breakLengths);
@@ -17,23 +21,11 @@ function createShiftGradient(shiftStart, shiftEnd, breaks) {
     ];
 
     breaks.forEach(breakPeriod => {
-        const breakStart = breakPeriod.start.getTime();
-        const breakEnd = breakPeriod.end.getTime();
-        const breakPosition = (breakStart - shiftStart.getTime()) / shiftLength * 100 + '%';
+        const breakStartMoment = moment(breakPeriod.start);
+        const breakEndMoment = moment(breakPeriod.end);
+        const breakPosition = breakStartMoment.diff(shiftStartMoment) / shiftLength * 100 + '%';
         colorStops.push({ color: 'red', position: breakPosition });
 
-        const breakEndPosition = (breakEnd - shiftStart.getTime()) / shiftLength * 100 + '%';
+        const breakEndPosition = breakEndMoment.diff(shiftStartMoment) / shiftLength * 100 + '%';
         colorStops.push({ color: 'green', position: breakEndPosition });
     });
-
-    // Construct the gradient string
-    let gradientString = 'linear-gradient(to right';
-    colorStops.forEach(stop => {
-        gradientString += `, ${stop.color} ${stop.position}`;
-    });
-    gradientString += ')';
-
-    // Apply the gradient to the element
-    const element = document.getElementById('shift-gradient');
-    element.style.background = gradientString;
-}
