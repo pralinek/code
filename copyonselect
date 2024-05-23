@@ -1,0 +1,74 @@
+import React, { useEffect, useRef } from 'react';
+import { DataSet, Timeline } from 'vis-timeline/standalone';
+import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
+
+const TimelineWithLongPress: React.FC = () => {
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const longPressTimeout = useRef<number | null>(null);
+  const longPressDuration = 500; // Duration for long press in milliseconds
+
+  useEffect(() => {
+    if (!timelineRef.current) return;
+
+    // Create a DataSet with items
+    const items = new DataSet([
+      { id: 1, content: 'item 1', start: '2023-04-20' },
+      { id: 2, content: 'item 2', start: '2023-04-14' },
+      { id: 3, content: 'item 3', start: '2023-04-18' },
+      { id: 4, content: 'item 4', start: '2023-04-16' },
+      { id: 5, content: 'item 5', start: '2023-04-25' },
+      { id: 6, content: 'item 6', start: '2023-04-27' }
+    ]);
+
+    // Configuration for the Timeline
+    const options = {
+      width: '100%',
+      height: '400px'
+    };
+
+    // Create a Timeline
+    const timeline = new Timeline(timelineRef.current, items, options);
+
+    // Event listeners for detecting long press
+    timeline.on('itemmousedown', (properties) => {
+      longPressTimeout.current = window.setTimeout(() => {
+        onLongPress(properties);
+      }, longPressDuration);
+    });
+
+    timeline.on('itemmouseup', () => {
+      clearLongPressTimeout();
+    });
+
+    timeline.on('itemmouseout', () => {
+      clearLongPressTimeout();
+    });
+
+    return () => {
+      // Clean up the timeline instance and event listeners
+      timeline.destroy();
+    };
+  }, []);
+
+  const clearLongPressTimeout = () => {
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      longPressTimeout.current = null;
+    }
+  };
+
+  const onLongPress = (properties: any) => {
+    console.log('Long press detected on item:', properties.item);
+    // Add your custom logic here
+    alert('Long press detected on item: ' + properties.item);
+  };
+
+  return (
+    <div>
+      <h1>vis-timeline Long Press Example</h1>
+      <div ref={timelineRef}></div>
+    </div>
+  );
+};
+
+export default TimelineWithLongPress;
