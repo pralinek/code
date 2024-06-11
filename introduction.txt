@@ -1,0 +1,19 @@
+[Opening Shot: Professional attire, standing in a well-lit, neutral background]
+[00:00 - 00:10]
+Introduction
+“Hello, I’m Tomasz Olech, and I’ve been part of our company’s journey as a [Current Position] in the Development team. I started my career here as a Service Desk Agent and quickly found ways to streamline our work processes.”
+[Cut to visual of the clipboard app interface or coding environment]
+[00:10 - 00:30]
+“Seeing an opportunity to improve efficiency, I developed my favorite app: a clipboard storage application that enables copying text from pictures, making it easier to fill out forms and significantly enhancing my colleagues’ workflow. This initiative fueled my ambition to become a software engineer, enabling me to contribute even more effectively.”
+[00:30 - 00:55]
+[Cut to visual of dispatching tool app]
+“My biggest achievement has been designing a dispatching tool application that enables support leaders to view the shifts of support agents and assign tickets efficiently, ensuring we meet our Service Level Agreements (SLAs) without overloading the agents.”
+[00:55 - 01:20]
+[Cut to visual of early stage of scheduler tool which drag and drop components]
+“Currently, I’m working on an innovative scheduler that integrates ServiceNow, messaging, employee scheduling, and shifts. This project is a further enhancement of the dispatching tool application, aiming to create a more seamless and reliable support experience by optimizing how we manage support tickets and communicate shift changes.”
+[01:15 - 01:30]
+Conclusion
+“I am passionate about leveraging technology to solve problems and drive improvements. With your support, I’m eager to continue advancing these innovations in a management capacity, helping our team achieve even greater success.”
+[Add a closing note, such as your name and contact information, or a thank you message]
+
+[Fade Out]
