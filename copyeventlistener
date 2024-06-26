@@ -1,0 +1,19 @@
+import { useEffect } from 'react';
+
+const useCopyEventListener = (handler) => {
+  useEffect(() => {
+    // Add the copy event listener
+    const handleCopy = (event) => {
+      handler(event);
+    };
+    
+    document.addEventListener('copy', handleCopy);
+    
+    // Cleanup function to remove the copy event listener
+    return () => {
+      document.removeEventListener('copy', handleCopy);
+    };
+  }, [handler]); // Re-run the effect if handler changes
+};
+
+export default useCopyEventListener;
