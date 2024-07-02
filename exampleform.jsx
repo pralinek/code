@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Form, FormGroup, Label, Input, Button, FormFeedback } from 'reactstrap';
 
 const ExampleForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { control, handleSubmit } = useForm();
   const [currentValue, setCurrentValue] = useState('Initial Value');
 
   const onSubmit = (data) => {
@@ -17,14 +17,23 @@ const ExampleForm = () => {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormGroup>
           <Label for="exampleInput">Change Value</Label>
-          <Input
-            type="text"
+          <Controller
             name="exampleInput"
-            id="exampleInput"
-            {...register('exampleInput', { required: 'This field is required' })}
-            invalid={!!errors.exampleInput} // This sets the invalid prop to true if there's an error
+            control={control}
+            defaultValue=""
+            rules={{ required: 'This field is required' }}
+            render={({ field, fieldState }) => (
+              <div>
+                <Input
+                  type="text"
+                  id="exampleInput"
+                  {...field}
+                  invalid={!!fieldState.error}
+                />
+                {fieldState.error && <FormFeedback>{fieldState.error.message}</FormFeedback>}
+              </div>
+            )}
           />
-          {errors.exampleInput && <FormFeedback>{errors.exampleInput.message}</FormFeedback>}
         </FormGroup>
         <Button type="submit">Submit</Button>
       </Form>
