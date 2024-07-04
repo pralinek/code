@@ -1,133 +1,134 @@
 import React from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
-import DatePicker from 'react-datepicker';
-import styled from 'styled-components';
-import 'react-datepicker/dist/react-datepicker.css';
-
-const FormContainer = styled.div`
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
-
-const Button = styled.button`
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background: #0056b3;
-  }
-`;
-
-const DatePickerContainer = styled.div`
-  margin-bottom: 20px;
-`;
+import { useForm, Controller } from 'react-hook-form';
+import { Box, Button, Typography, IconButton, TextField } from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import moment from 'moment';
 
 type FormValues = {
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: moment.Moment | null;
+  endDate: moment.Moment | null;
 };
 
 const DateRangePicker: React.FC = () => {
-  const { control, handleSubmit, setValue } = useForm<FormValues>();
+  const { control, setValue, watch } = useForm<FormValues>({
+    defaultValues: {
+      startDate: moment(),
+      endDate: moment(),
+    },
+  });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
-  };
+  const startDate = watch('startDate');
+  const endDate = watch('endDate');
 
   const setCurrentMonth = () => {
-    const start = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+    const start = moment().startOf('month');
+    const end = moment().endOf('month');
     setValue('startDate', start);
     setValue('endDate', end);
   };
 
   const setCurrentWeek = () => {
-    const current = new Date();
-    const first = current.getDate() - current.getDay() + 1; // First day is the day of the month - the day of the week
-    const last = first + 6; // last day is the first day + 6
-    const start = new Date(current.setDate(first));
-    const end = new Date(current.setDate(last));
+    const start = moment().startOf('week');
+    const end = moment().endOf('week');
     setValue('startDate', start);
     setValue('endDate', end);
   };
 
   const setCurrentYear = () => {
-    const start = new Date(new Date().getFullYear(), 0, 1);
-    const end = new Date(new Date().getFullYear(), 11, 31);
+    const start = moment().startOf('year');
+    const end = moment().endOf('year');
     setValue('startDate', start);
     setValue('endDate', end);
   };
 
   const setCurrentDay = () => {
-    const today = new Date();
+    const today = moment();
     setValue('startDate', today);
     setValue('endDate', today);
   };
 
-  return (
-    <FormContainer>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <ButtonRow>
-          <Button type="button" onClick={setCurrentMonth}>Current Month</Button>
-          <Button type="button" onClick={setCurrentWeek}>Current Week</Button>
-          <Button type="button" onClick={setCurrentYear}>Current Year</Button>
-          <Button type="button" onClick={setCurrentDay}>Current Day</Button>
-        </ButtonRow>
-        
-        <DatePickerContainer>
-          <label>Start Date</label>
-          <Controller
-            control={control}
-            name="startDate"
-            render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                selectsStart
-                startDate={field.value}
-                endDate={field.value}
-                dateFormat="yyyy/MM/dd"
-              />
-            )}
-          />
-        </DatePickerContainer>
-        
-        <DatePickerContainer>
-          <label>End Date</label>
-          <Controller
-            control={control}
-            name="endDate"
-            render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                selectsEnd
-                startDate={field.value}
-                endDate={field.value}
-                dateFormat="yyyy/MM/dd"
-                minDate={field.value}
-              />
-            )}
-          />
-        </DatePickerContainer>
+  const adjustDate = (days: number) => {
+    if (startDate && endDate) {
+      setValue('startDate', startDate.clone().add(days, 'days'));
+      setValue('endDate', endDate.clone().add(days, 'days'));
+    }
+  };
 
-        <Button type="submit">Submit</Button>
-      </form>
-    </FormContainer>
+  return (
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <Box
+        sx={{
+          maxWidth: 600,
+          mx: 'auto',
+          p: 3,
+          backgroundColor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Typography variant="h6">{`${startDate?.format('MMMM D, YYYY')} - ${endDate?.format('MMMM D, YYYY')}`}</Typography>
+          <Typography variant="body1">{`${startDate?.format('MMMM')} ${startDate?.format('D')}, ${startDate?.format('YYYY')} - Week ${startDate?.week()}`}</Typography>
+        </Box>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <IconButton onClick={() => adjustDate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <IconButton onClick={() => adjustDate(1)}>
+            <ArrowForwardIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Button variant="contained" onClick={setCurrentMonth}>
+            Current Month
+          </Button>
+          <Button variant="contained" onClick={setCurrentWeek}>
+            Current Week
+          </Button>
+          <Button variant="contained" onClick={setCurrentYear}>
+            Current Year
+          </Button>
+          <Button variant="contained" onClick={setCurrentDay}>
+            Current Day
+          </Button>
+        </Box>
+
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              label="Start Date"
+              value={field.value}
+              onChange={(date) => field.onChange(date)}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth margin="normal" />
+              )}
+            />
+          )}
+        />
+
+        <Controller
+          name="endDate"
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              label="End Date"
+              value={field.value}
+              onChange={(date) => field.onChange(date)}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth margin="normal" />
+              )}
+            />
+          )}
+        />
+      </Box>
+    </LocalizationProvider>
   );
 };
 
