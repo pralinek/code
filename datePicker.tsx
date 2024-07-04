@@ -29,38 +29,51 @@ const DateRangePicker: React.FC = () => {
 
   const handlePeriodChange = (event: React.ChangeEvent<{ value: PeriodOption }>) => {
     setPeriod(event.target.value);
-    updateEndDate(event.target.value);
   };
 
-  const updateEndDate = (selectedPeriod: PeriodOption) => {
-    switch (selectedPeriod) {
+  const setCurrentPeriod = () => {
+    switch (period) {
       case 'day':
-        setValue('endDate', startDate?.clone().add(1, 'day') || null);
+        setValue('startDate', moment().startOf('day'));
+        setValue('endDate', moment().startOf('day'));
         break;
       case 'week':
-        setValue('endDate', startDate?.clone().add(1, 'week') || null);
+        setValue('startDate', moment().startOf('isoWeek'));
+        setValue('endDate', moment().endOf('isoWeek'));
         break;
       case 'month':
-        setValue('endDate', startDate?.clone().add(1, 'month') || null);
+        setValue('startDate', moment().startOf('month'));
+        setValue('endDate', moment().endOf('month'));
         break;
       case 'year':
-        setValue('endDate', startDate?.clone().add(1, 'year') || null);
+        setValue('startDate', moment().startOf('year'));
+        setValue('endDate', moment().endOf('year'));
         break;
       default:
         break;
     }
   };
 
-  const setCurrentDay = () => {
-    const today = moment();
-    setValue('startDate', today);
-    updateEndDate(period);
-  };
-
-  const adjustDate = (days: number) => {
-    if (startDate) {
-      setValue('startDate', startDate.clone().add(days, 'days'));
-      setValue('endDate', startDate.clone().add(days + 1, 'days'));
+  const adjustPeriod = (amount: number) => {
+    switch (period) {
+      case 'day':
+        setValue('startDate', startDate?.clone().add(amount, 'days'));
+        setValue('endDate', endDate?.clone().add(amount, 'days'));
+        break;
+      case 'week':
+        setValue('startDate', startDate?.clone().add(amount, 'weeks').startOf('isoWeek'));
+        setValue('endDate', endDate?.clone().add(amount, 'weeks').endOf('isoWeek'));
+        break;
+      case 'month':
+        setValue('startDate', startDate?.clone().add(amount, 'months').startOf('month'));
+        setValue('endDate', endDate?.clone().add(amount, 'months').endOf('month'));
+        break;
+      case 'year':
+        setValue('startDate', startDate?.clone().add(amount, 'years').startOf('year'));
+        setValue('endDate', endDate?.clone().add(amount, 'years').endOf('year'));
+        break;
+      default:
+        break;
     }
   };
 
@@ -69,9 +82,9 @@ const DateRangePicker: React.FC = () => {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
-          maxWidth: 800,
+          maxWidth: 600,
           mx: 'auto',
           p: 3,
           backgroundColor: 'background.paper',
@@ -79,54 +92,48 @@ const DateRangePicker: React.FC = () => {
           boxShadow: 1,
         }}
       >
-        <Box sx={{ textAlign: 'center', flex: 1 }}>
-          <IconButton onClick={() => adjustDate(-1)}>
-            <ArrowBackIcon />
-          </IconButton>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <DatePicker
             label="Start Date"
             value={startDate}
             onChange={(date) => setValue('startDate', date)}
             renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
           />
-          <IconButton onClick={() => adjustDate(1)}>
-            <ArrowForwardIcon />
-          </IconButton>
-          <IconButton onClick={setCurrentDay} sx={{ mt: 1 }}>
-            <TodayIcon />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ textAlign: 'center', flex: 1 }}>
-          <Typography variant="h6">Select Period</Typography>
-          <TextField
-            select
-            fullWidth
-            value={period}
-            onChange={handlePeriodChange}
-            variant="outlined"
-            margin="normal"
-          >
-            <MenuItem value="day">Day</MenuItem>
-            <MenuItem value="week">Week</MenuItem>
-            <MenuItem value="month">Month</MenuItem>
-            <MenuItem value="year">Year</MenuItem>
-          </TextField>
-        </Box>
-
-        <Box sx={{ textAlign: 'center', flex: 1 }}>
-          <IconButton onClick={() => adjustDate(-1)}>
-            <ArrowBackIcon />
-          </IconButton>
           <DatePicker
             label="End Date"
             value={endDate}
             onChange={(date) => setValue('endDate', date)}
             renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
           />
-          <IconButton onClick={() => adjustDate(1)}>
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mt: 2 }}>
+          <IconButton onClick={() => adjustPeriod(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <TextField
+            select
+            value={period}
+            onChange={handlePeriodChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+          >
+            <MenuItem value="day">Day</MenuItem>
+            <MenuItem value="week">Week</MenuItem>
+            <MenuItem value="month">Month</MenuItem>
+            <MenuItem value="year">Year</MenuItem>
+          </TextField>
+          <IconButton onClick={() => adjustPeriod(1)}>
             <ArrowForwardIcon />
           </IconButton>
+          <Button
+            variant="outlined"
+            startIcon={<TodayIcon />}
+            onClick={setCurrentPeriod}
+          >
+            Current {period}
+          </Button>
         </Box>
       </Box>
     </LocalizationProvider>
