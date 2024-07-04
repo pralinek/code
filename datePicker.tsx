@@ -5,7 +5,6 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import TodayIcon from '@mui/icons-material/Today';
 import moment, { Moment } from 'moment';
 
 type PeriodOption = 'day' | 'week' | 'month' | 'year';
@@ -18,21 +17,22 @@ type FormValues = {
 const DateRangePicker: React.FC = () => {
   const { control, setValue, watch } = useForm<FormValues>({
     defaultValues: {
-      startDate: moment(),
-      endDate: moment(),
+      startDate: moment().startOf('month'),
+      endDate: moment().endOf('month'),
     },
   });
 
-  const [period, setPeriod] = useState<PeriodOption>('day');
+  const [period, setPeriod] = useState<PeriodOption>('month');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
 
   const handlePeriodChange = (event: React.ChangeEvent<{ value: PeriodOption }>) => {
     setPeriod(event.target.value);
+    updateDates(event.target.value);
   };
 
-  const setCurrentPeriod = () => {
-    switch (period) {
+  const updateDates = (selectedPeriod: PeriodOption) => {
+    switch (selectedPeriod) {
       case 'day':
         setValue('startDate', moment().startOf('day'));
         setValue('endDate', moment().startOf('day'));
@@ -84,33 +84,51 @@ const DateRangePicker: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          maxWidth: 600,
-          mx: 'auto',
+          maxWidth: 'auto',
           p: 3,
           backgroundColor: 'background.paper',
           borderRadius: 2,
           boxShadow: 1,
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <Typography variant="h6">
+          {`${startDate?.format('MMMM D, YYYY')} - ${endDate?.format('MMMM D, YYYY')}`}
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            mt: 2,
+          }}
+        >
           <DatePicker
             label="Start Date"
             value={startDate}
             onChange={(date) => setValue('startDate', date)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+            renderInput={(params) => <TextField {...params} fullWidth />}
           />
+
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton onClick={() => adjustPeriod(-1)}>
+              <ArrowBackIcon />
+            </IconButton>
+            <IconButton onClick={() => adjustPeriod(1)}>
+              <ArrowForwardIcon />
+            </IconButton>
+          </Box>
+
           <DatePicker
             label="End Date"
             value={endDate}
             onChange={(date) => setValue('endDate', date)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+            renderInput={(params) => <TextField {...params} fullWidth />}
           />
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mt: 2 }}>
-          <IconButton onClick={() => adjustPeriod(-1)}>
-            <ArrowBackIcon />
-          </IconButton>
+        <Box sx={{ width: '100%', mt: 2 }}>
           <TextField
             select
             value={period}
@@ -124,16 +142,6 @@ const DateRangePicker: React.FC = () => {
             <MenuItem value="month">Month</MenuItem>
             <MenuItem value="year">Year</MenuItem>
           </TextField>
-          <IconButton onClick={() => adjustPeriod(1)}>
-            <ArrowForwardIcon />
-          </IconButton>
-          <Button
-            variant="outlined"
-            startIcon={<TodayIcon />}
-            onClick={setCurrentPeriod}
-          >
-            Current {period}
-          </Button>
         </Box>
       </Box>
     </LocalizationProvider>
