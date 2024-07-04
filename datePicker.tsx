@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Box, Button, Typography, IconButton, TextField, MenuItem } from '@mui/material';
+import { Control, Controller, UseFormSetValue } from 'react-hook-form';
+import { Box, Typography, IconButton, TextField, MenuItem } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -9,26 +9,16 @@ import moment, { Moment } from 'moment';
 
 type PeriodOption = 'day' | 'week' | 'month' | 'year';
 
-type FormValues = {
-  startDate: Moment | null;
-  endDate: Moment | null;
+type DateRangePickerProps = {
+  control: Control<{ startDate: Moment | null; endDate: Moment | null; period: PeriodOption }>;
+  setValue: UseFormSetValue<{ startDate: Moment | null; endDate: Moment | null; period: PeriodOption }>;
 };
 
-const DateRangePicker: React.FC = () => {
-  const { control, setValue, watch } = useForm<FormValues>({
-    defaultValues: {
-      startDate: moment().startOf('month'),
-      endDate: moment().endOf('month'),
-    },
-  });
-
-  const [period, setPeriod] = useState<PeriodOption>('month');
-  const startDate = watch('startDate');
-  const endDate = watch('endDate');
-
-  const handlePeriodChange = (event: React.ChangeEvent<{ value: PeriodOption }>) => {
-    setPeriod(event.target.value);
-    updateDates(event.target.value);
+const DateRangePicker: React.FC<DateRangePickerProps> = ({ control, setValue }) => {
+  const handlePeriodChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const selectedPeriod = event.target.value as PeriodOption;
+    setValue('period', selectedPeriod);
+    updateDates(selectedPeriod);
   };
 
   const updateDates = (selectedPeriod: PeriodOption) => {
@@ -54,7 +44,7 @@ const DateRangePicker: React.FC = () => {
     }
   };
 
-  const adjustPeriod = (amount: number) => {
+  const adjustPeriod = (amount: number, startDate: Moment | null, endDate: Moment | null, period: PeriodOption) => {
     switch (period) {
       case 'day':
         setValue('startDate', startDate?.clone().add(amount, 'days'));
@@ -91,58 +81,80 @@ const DateRangePicker: React.FC = () => {
           boxShadow: 1,
         }}
       >
-        <Typography variant="h6">
-          {`${startDate?.format('MMMM D, YYYY')} - ${endDate?.format('MMMM D, YYYY')}`}
-        </Typography>
+        <Controller
+          name="startDate"
+          control={control}
+          render={({ field: { value: startDate } }) => (
+            <Controller
+              name="endDate"
+              control={control}
+              render={({ field: { value: endDate } }) => (
+                <>
+                  <Controller
+                    name="period"
+                    control={control}
+                    render={({ field: { value: period } }) => (
+                      <>
+                        <Typography variant="h6">
+                          {`${startDate?.format('MMMM D, YYYY')} - ${endDate?.format('MMMM D, YYYY')}`}
+                        </Typography>
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            mt: 2,
-          }}
-        >
-          <DatePicker
-            label="Start Date"
-            value={startDate}
-            onChange={(date) => setValue('startDate', date)}
-            renderInput={(params) => <TextField {...params} fullWidth />}
-          />
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '100%',
+                            mt: 2,
+                          }}
+                        >
+                          <DatePicker
+                            label="Start Date"
+                            value={startDate}
+                            onChange={(date) => setValue('startDate', date)}
+                            renderInput={(params) => <TextField {...params} fullWidth />}
+                          />
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton onClick={() => adjustPeriod(-1)}>
-              <ArrowBackIcon />
-            </IconButton>
-            <IconButton onClick={() => adjustPeriod(1)}>
-              <ArrowForwardIcon />
-            </IconButton>
-          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <IconButton onClick={() => adjustPeriod(-1, startDate, endDate, period)}>
+                              <ArrowBackIcon />
+                            </IconButton>
+                            <IconButton onClick={() => adjustPeriod(1, startDate, endDate, period)}>
+                              <ArrowForwardIcon />
+                            </IconButton>
+                          </Box>
 
-          <DatePicker
-            label="End Date"
-            value={endDate}
-            onChange={(date) => setValue('endDate', date)}
-            renderInput={(params) => <TextField {...params} fullWidth />}
-          />
-        </Box>
+                          <DatePicker
+                            label="End Date"
+                            value={endDate}
+                            onChange={(date) => setValue('endDate', date)}
+                            renderInput={(params) => <TextField {...params} fullWidth />}
+                          />
+                        </Box>
 
-        <Box sx={{ width: '100%', mt: 2 }}>
-          <TextField
-            select
-            value={period}
-            onChange={handlePeriodChange}
-            variant="outlined"
-            margin="normal"
-            fullWidth
-          >
-            <MenuItem value="day">Day</MenuItem>
-            <MenuItem value="week">Week</MenuItem>
-            <MenuItem value="month">Month</MenuItem>
-            <MenuItem value="year">Year</MenuItem>
-          </TextField>
-        </Box>
+                        <Box sx={{ width: '100%', mt: 2 }}>
+                          <TextField
+                            select
+                            value={period}
+                            onChange={handlePeriodChange}
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                          >
+                            <MenuItem value="day">Day</MenuItem>
+                            <MenuItem value="week">Week</MenuItem>
+                            <MenuItem value="month">Month</MenuItem>
+                            <MenuItem value="year">Year</MenuItem>
+                          </TextField>
+                        </Box>
+                      </>
+                    )}
+                  />
+                </>
+              )}
+            />
+          )}
+        />
       </Box>
     </LocalizationProvider>
   );
