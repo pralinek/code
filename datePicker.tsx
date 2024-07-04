@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Box, Button, Typography, IconButton, TextField } from '@mui/material';
+import { Box, Button, Typography, IconButton, TextField, MenuItem } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import moment from 'moment';
+import TodayIcon from '@mui/icons-material/Today';
+import moment, { Moment } from 'moment';
+
+type PeriodOption = 'day' | 'week' | 'month' | 'year';
 
 type FormValues = {
-  startDate: moment.Moment | null;
-  endDate: moment.Moment | null;
+  startDate: Moment | null;
+  endDate: Moment | null;
 };
 
 const DateRangePicker: React.FC = () => {
@@ -20,40 +23,44 @@ const DateRangePicker: React.FC = () => {
     },
   });
 
+  const [period, setPeriod] = useState<PeriodOption>('day');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
 
-  const setCurrentMonth = () => {
-    const start = moment().startOf('month');
-    const end = moment().endOf('month');
-    setValue('startDate', start);
-    setValue('endDate', end);
+  const handlePeriodChange = (event: React.ChangeEvent<{ value: PeriodOption }>) => {
+    setPeriod(event.target.value);
+    updateEndDate(event.target.value);
   };
 
-  const setCurrentWeek = () => {
-    const start = moment().startOf('week');
-    const end = moment().endOf('week');
-    setValue('startDate', start);
-    setValue('endDate', end);
-  };
-
-  const setCurrentYear = () => {
-    const start = moment().startOf('year');
-    const end = moment().endOf('year');
-    setValue('startDate', start);
-    setValue('endDate', end);
+  const updateEndDate = (selectedPeriod: PeriodOption) => {
+    switch (selectedPeriod) {
+      case 'day':
+        setValue('endDate', startDate?.clone().add(1, 'day') || null);
+        break;
+      case 'week':
+        setValue('endDate', startDate?.clone().add(1, 'week') || null);
+        break;
+      case 'month':
+        setValue('endDate', startDate?.clone().add(1, 'month') || null);
+        break;
+      case 'year':
+        setValue('endDate', startDate?.clone().add(1, 'year') || null);
+        break;
+      default:
+        break;
+    }
   };
 
   const setCurrentDay = () => {
     const today = moment();
     setValue('startDate', today);
-    setValue('endDate', today);
+    updateEndDate(period);
   };
 
   const adjustDate = (days: number) => {
-    if (startDate && endDate) {
+    if (startDate) {
       setValue('startDate', startDate.clone().add(days, 'days'));
-      setValue('endDate', endDate.clone().add(days, 'days'));
+      setValue('endDate', startDate.clone().add(days + 1, 'days'));
     }
   };
 
@@ -61,7 +68,10 @@ const DateRangePicker: React.FC = () => {
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <Box
         sx={{
-          maxWidth: 600,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          maxWidth: 800,
           mx: 'auto',
           p: 3,
           backgroundColor: 'background.paper',
@@ -69,64 +79,55 @@ const DateRangePicker: React.FC = () => {
           boxShadow: 1,
         }}
       >
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Typography variant="h6">{`${startDate?.format('MMMM D, YYYY')} - ${endDate?.format('MMMM D, YYYY')}`}</Typography>
-          <Typography variant="body1">{`${startDate?.format('MMMM')} ${startDate?.format('D')}, ${startDate?.format('YYYY')} - Week ${startDate?.week()}`}</Typography>
-        </Box>
-        
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ textAlign: 'center', flex: 1 }}>
           <IconButton onClick={() => adjustDate(-1)}>
             <ArrowBackIcon />
           </IconButton>
+          <DatePicker
+            label="Start Date"
+            value={startDate}
+            onChange={(date) => setValue('startDate', date)}
+            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+          />
+          <IconButton onClick={() => adjustDate(1)}>
+            <ArrowForwardIcon />
+          </IconButton>
+          <IconButton onClick={setCurrentDay} sx={{ mt: 1 }}>
+            <TodayIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ textAlign: 'center', flex: 1 }}>
+          <Typography variant="h6">Select Period</Typography>
+          <TextField
+            select
+            fullWidth
+            value={period}
+            onChange={handlePeriodChange}
+            variant="outlined"
+            margin="normal"
+          >
+            <MenuItem value="day">Day</MenuItem>
+            <MenuItem value="week">Week</MenuItem>
+            <MenuItem value="month">Month</MenuItem>
+            <MenuItem value="year">Year</MenuItem>
+          </TextField>
+        </Box>
+
+        <Box sx={{ textAlign: 'center', flex: 1 }}>
+          <IconButton onClick={() => adjustDate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <DatePicker
+            label="End Date"
+            value={endDate}
+            onChange={(date) => setValue('endDate', date)}
+            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+          />
           <IconButton onClick={() => adjustDate(1)}>
             <ArrowForwardIcon />
           </IconButton>
         </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Button variant="contained" onClick={setCurrentMonth}>
-            Current Month
-          </Button>
-          <Button variant="contained" onClick={setCurrentWeek}>
-            Current Week
-          </Button>
-          <Button variant="contained" onClick={setCurrentYear}>
-            Current Year
-          </Button>
-          <Button variant="contained" onClick={setCurrentDay}>
-            Current Day
-          </Button>
-        </Box>
-
-        <Controller
-          name="startDate"
-          control={control}
-          render={({ field }) => (
-            <DatePicker
-              label="Start Date"
-              value={field.value}
-              onChange={(date) => field.onChange(date)}
-              renderInput={(params) => (
-                <TextField {...params} fullWidth margin="normal" />
-              )}
-            />
-          )}
-        />
-
-        <Controller
-          name="endDate"
-          control={control}
-          render={({ field }) => (
-            <DatePicker
-              label="End Date"
-              value={field.value}
-              onChange={(date) => field.onChange(date)}
-              renderInput={(params) => (
-                <TextField {...params} fullWidth margin="normal" />
-              )}
-            />
-          )}
-        />
       </Box>
     </LocalizationProvider>
   );
