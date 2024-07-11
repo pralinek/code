@@ -1,0 +1,27 @@
+function adjustDateToTimezone(isoString, timezone) {
+  // Parse the date using moment
+  let momentDate = moment(isoString);
+
+  // Get the current offset
+  const currentOffset = momentDate.utcOffset();
+
+  // Convert the date to the specified timezone
+  momentDate = momentDate.tz(timezone);
+
+  // Get the new offset
+  const newOffset = momentDate.utcOffset();
+
+  // Adjust the time based on the difference in offsets
+  const offsetDifference = newOffset - currentOffset;
+  momentDate.add(offsetDifference, 'minutes');
+
+  // Return the ISO string of the modified date
+  return momentDate.toISOString();
+}
+
+// Example usage
+const startDate = '2023-07-10T10:00:00Z'; // Original start date in ISO string format
+const timezone = 'Asia/Kolkata'; // Desired timezone
+
+const adjustedStartDate = adjustDateToTimezone(startDate, timezone);
+console.log(adjustedStartDate); // Output the adjusted start date

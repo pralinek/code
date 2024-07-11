@@ -1,0 +1,62 @@
+const locales = {
+  'Europe/Warsaw': {
+    current: 'obecny',
+    time: 'czas',
+    date: 'data',
+    months: [
+      'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+      'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+    ],
+    monthsShort: [
+      'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
+      'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'
+    ],
+    weekdays: [
+      'Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'
+    ],
+    weekdaysShort: [
+      'Niedz', 'Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'
+    ],
+    format: 'YYYY-MM-DD HH:mm:ss' // Example format
+  },
+  'Asia/Kolkata': {
+    current: 'वर्तमान',
+    time: 'समय',
+    date: 'तारीख',
+    months: [
+      'जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
+      'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'
+    ],
+    monthsShort: [
+      'जन', 'फर', 'मार्च', 'अप्रै', 'मई', 'जून',
+      'जुलाई', 'अग', 'सित', 'अक्टू', 'नव', 'दिस'
+    ],
+    weekdays: [
+      'रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'
+    ],
+    weekdaysShort: [
+      'रवि', 'सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि'
+    ],
+    format: 'DD-MM-YYYY HH:mm:ss' // Example format
+  },
+  'America/New_York': {
+    current: 'current',
+    time: 'time',
+    date: 'date',
+    months: [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ],
+    monthsShort: [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ],
+    weekdays: [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ],
+    weekdaysShort: [
+      'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    ],
+    format: 'MM/DD/YYYY HH:mm:ss' // Example format
+  }
+};
