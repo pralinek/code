@@ -15,3 +15,26 @@ const endDate = formatDate(now);
 const query = `createdOn>=${startDate}^createdOn<=${endDate}`;
 
 console.log(query); // Example output: createdOn>=2023-07-21T12:34:56^createdOn<=2023-07-28T12:34:56
+
+
+/////////////////////////////////////////////////////
+class Program
+{
+    static void Main()
+    {
+        // Get the current date and time in UTC
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+
+        // Calculate the date and time one week ago
+        DateTimeOffset oneWeekAgo = now.AddDays(-7);
+
+        // Format dates to ISO 8601 without milliseconds
+        string startDate = oneWeekAgo.ToString("yyyy-MM-ddTHH:mm:ss");
+        string endDate = now.ToString("yyyy-MM-ddTHH:mm:ss");
+
+        // Construct the ServiceNow query string
+        string query = $"createdOn>={startDate}^createdOn<={endDate}";
+
+        // Output the query string
+        Console.WriteLine(query); // Example output: createdOn>=2023-07-21T12:34:56^createdOn<=2023-07-28T12:34:56
+    }
