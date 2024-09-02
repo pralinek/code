@@ -1,0 +1,35 @@
+using NodaTime;
+using NodaTime.TimeZones;
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Example mapping of countries to time zone IDs
+        var countryToTimeZone = new Dictionary<string, string>
+        {
+            { "US", "America/New_York" },
+            { "GB", "Europe/London" },
+            { "FR", "Europe/Paris" },
+            { "IN", "Asia/Kolkata" },
+            // Add more mappings as needed
+        };
+
+        string countryCode = "US"; // Example country code
+
+        if (countryToTimeZone.TryGetValue(countryCode, out string timeZoneId))
+        {
+            var timeZone = DateTimeZoneProviders.Tzdb[timeZoneId];
+            var now = SystemClock.Instance.GetCurrentInstant();
+            var localTime = now.InZone(timeZone);
+
+            Console.WriteLine($"Current time in {countryCode} ({timeZoneId}): {localTime}");
+        }
+        else
+        {
+            Console.WriteLine("Time zone not found for the specified country.");
+        }
+    }
+}
