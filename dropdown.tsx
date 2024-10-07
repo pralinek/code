@@ -1,31 +1,32 @@
 import React from 'react';
-import { DropdownList } from 'react-widgets';
-import 'react-widgets/styles.css';
+import { Drawer, List, ListItem, ListItemText } from '@mui/material';
 
 const NavBar = () => {
     const menuItems = ['Home', 'About', 'Services', 'Contact'];
 
     return (
-        <nav style={{ backgroundColor: '#333', padding: '1rem' }}>
-            <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0 }}>
-                {menuItems.map((item) => (
-                    <li key={item} style={{ marginRight: '2rem' }}>
-                        <DropdownList
-                            data={[item]} 
-                            defaultValue={item}
-                            style={{
-                                backgroundColor: '#333',
-                                color: 'white',
-                                border: 'none',
-                                cursor: 'pointer',
-                            }}
-                            containerClassName="nav-dropdown"
-                            inputProps={{ style: { color: 'white' } }}
-                        />
-                    </li>
+        <Drawer
+            variant="permanent"
+            anchor="left"
+            sx={{
+                width: 240,
+                flexShrink: 0,
+                [`& .MuiDrawer-paper`]: {
+                    width: 240,
+                    boxSizing: 'border-box',
+                    backgroundColor: '#333',
+                    color: '#fff',
+                },
+            }}
+        >
+            <List>
+                {menuItems.map((text, index) => (
+                    <ListItem button key={text}>
+                        <ListItemText primary={text} />
+                    </ListItem>
                 ))}
-            </ul>
-        </nav>
+            </List>
+        </Drawer>
     );
 };
 
