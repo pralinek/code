@@ -1,0 +1,71 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+namespace Auto
+{
+    class Program
+    {
+        // Import SendInput for simulating mouse clicks
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
+
+        private const uint MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const uint MOUSEEVENTF_LEFTUP = 0x04;
+
+        // Variables to control the auto clicker
+        private static bool isRunning = false; // Determines whether the clicker is running
+        private static int clickInterval = 100; // Interval between clicks in milliseconds
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("AutoClicker started!");
+            Console.WriteLine("Press 'S' to start/stop and 'Esc' to exit.");
+
+            while (true)
+            {
+                if (Console.KeyAvailable)
+                {
+                    var key = Console.ReadKey(true).Key;
+
+                    if (key == ConsoleKey.S)
+                    {
+                        isRunning = !isRunning;
+
+                        if (isRunning)
+                        {
+                            Console.WriteLine("AutoClicker started...");
+                            StartClicking();
+                        }
+                        else
+                        {
+                            Console.WriteLine("AutoClicker stopped...");
+                        }
+                    }
+                    else if (key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine("Exiting...");
+                        break;
+                    }
+                }
+
+                Thread.Sleep(100); // Reduce CPU usage while listening for key presses
+            }
+        }
+
+        private static void StartClicking()
+        {
+            new Thread(() =>
+            {
+                while (isRunning)
+                {
+                    // Simulate a left mouse click
+                    mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                    mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+                    Thread.Sleep(clickInterval); // Wait between clicks
+                }
+            }).Start();
+        }
+    }
+}
