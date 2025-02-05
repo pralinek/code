@@ -1,0 +1,163 @@
+Using the Microsoft Authentication Library (MSAL) in an ASP.NET Core application involves authenticating users securely between the frontend and backend. Here’s a detailed guide to achieve this:
+
+1. Install MSAL Libraries
+
+Backend:
+
+Install the Microsoft.Identity.Web and Microsoft.Identity.Web.UI libraries for ASP.NET Core:
+
+dotnet add package Microsoft.Identity.Web
+dotnet add package Microsoft.Identity.Web.UI
+
+Frontend:
+
+If you’re using React, install the MSAL React library:
+
+npm install @azure/msal-browser @azure/msal-react
+
+2. Register Your Application in Azure AD
+	1.	Go to the Azure Portal and register your application.
+	2.	Configure two app registrations:
+	•	Frontend App: Used by the React frontend.
+	•	Backend App: Used by the ASP.NET Core API.
+	3.	Set up the following in Azure AD:
+	•	Assign API permissions (e.g., Microsoft Graph or custom APIs) to the Backend App.
+	•	In the Frontend App, set the Backend App’s Application ID as an Exposed API scope.
+	•	Configure a redirect URI for the Frontend App.
+
+3. Backend Configuration
+
+In your ASP.NET Core API:
+
+Configure appsettings.json:
+
+{
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "Domain": "yourdomain.com",
+    "TenantId": "your-tenant-id",
+    "ClientId": "backend-client-id",
+    "Audience": "api://backend-client-id"
+  }
+}
+
+Add Authentication in Program.cs:
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Microsoft Identity
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(options =>
+    {
+        builder.Configuration.Bind("AzureAd", options);
+        options.TokenValidationParameters.ValidAudiences = new[] 
+        { 
+            builder.Configuration["AzureAd:Audience"] 
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+Secure API Endpoints:
+
+Decorate your controllers or actions with [Authorize]:
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class SecureController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult GetData()
+    {
+        return Ok("This is a secure endpoint.");
+    }
+}
+
+4. Frontend Configuration
+
+In your React app:
+
+Create the MSAL Instance:
+
+import { PublicClientApplication } from "@azure/msal-browser";
+
+const msalConfig = {
+    auth: {
+        clientId: "frontend-client-id",
+        authority: "https://login.microsoftonline.com/your-tenant-id",
+        redirectUri: "http://localhost:3000"
+    }
+};
+
+export const msalInstance = new PublicClientApplication(msalConfig);
+
+Acquire Access Token:
+
+Use MSAL React hooks to log in and acquire an access token for the backend API:
+
+import { useMsal } from "@azure/msal-react";
+
+const apiScope = "api://backend-client-id/.default";
+
+function callSecureApi() {
+    const { instance } = useMsal();
+
+    instance.acquireTokenSilent({
+        scopes: [apiScope]
+    }).then((response) => {
+        fetch("https://localhost:5001/api/secure", {
+            headers: {
+                Authorization: `Bearer ${response.accessToken}`
+            }
+        }).then((res) => res.json())
+        .then((data) => console.log(data));
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+Login Button:
+
+Add a simple login button:
+
+import { useMsal } from "@azure/msal-react";
+
+function LoginButton() {
+    const { instance } = useMsal();
+
+    const handleLogin = () => {
+        instance.loginPopup({
+            scopes: ["openid", "profile", "api://backend-client-id/.default"]
+        });
+    };
+
+    return <button onClick={handleLogin}>Login</button>;
+}
+
+5. Testing
+	1.	Run your backend (e.g., https://localhost:5001).
+	2.	Start your React frontend (e.g., http://localhost:3000).
+	3.	Use the Login Button to sign in, then call the secure API with the access token.
+
+Additional Tips
+	•	Use HTTPS for secure communication between the frontend and backend.
+	•	Enable CORS in your backend to allow requests from your frontend domain:
+
+app.UseCors(policy =>
+    policy.WithOrigins("http://localhost:3000")
+          .AllowAnyHeader()
+          .AllowAnyMethod());
+
+	•	Regularly refresh access tokens using acquireTokenSilent to maintain session.
+
+This setup ensures your frontend securely authenticates with Azure AD and accesses the backend using valid JWT tokens.
