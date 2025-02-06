@@ -1,0 +1,15 @@
+<DatePicker
+  slotProps={{
+    popper: {
+      modifiers: [
+        {
+          name: 'zIndex',
+          enabled: true,
+          options: {
+            zIndex: 9999, // Ensure it's above the dialog
+          },
+        },
+      ],
+    },
+  }}
+/>
