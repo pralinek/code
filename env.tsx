@@ -1,2 +1,3 @@
-- sed -i 's|"Environment": "[^"]*"|"Environment": "'$ENVIRONMENT'"|' appsettings.json
-- cat appsettings.json  # Debugging step (optional)
+<Target Name="CopyEnvFile" BeforeTargets="Build">
+<Copy SourceFiles=".env" DestinationFolder="$(SpaRoot)" />
+</Target>
