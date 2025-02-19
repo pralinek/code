@@ -1,3 +1,2 @@
-<Target Name="CopyEnvFile" BeforeTargets="Build">
-<Copy SourceFiles=".env" DestinationFolder="$(SpaRoot)" />
-</Target>
+- printenv | grep -E '^(CI|CUSTOM|REACT_APP|MY_VAR)_' > .env
+- cat .env  # Debug: show saved env variables
