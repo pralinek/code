@@ -1,1 +1,2 @@
-- sed -i 's|"DefaultConnection": ""|"DefaultConnection": "'$ConnectionStrings__DefaultConnection'"|' appsettings.json
+- sed -i 's|"Environment": "[^"]*"|"Environment": "'$ENVIRONMENT'"|' appsettings.json
+- cat appsettings.json  # Debugging step (optional)
