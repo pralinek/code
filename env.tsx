@@ -1,0 +1,1 @@
+- sed -i 's|"DefaultConnection": ""|"DefaultConnection": "'$ConnectionStrings__DefaultConnection'"|' appsettings.json
