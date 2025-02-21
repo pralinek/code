@@ -52,3 +52,7 @@ loadConfig().then(() => {
   });
 });
 
+
+
+const apiUrl = window.__RUNTIME_CONFIG__?.REACT_APP_API_URL || "https://fallback-url.com";
+console.log("API URL:", apiUrl);
