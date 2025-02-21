@@ -56,3 +56,14 @@ loadConfig().then(() => {
 
 const apiUrl = window.__RUNTIME_CONFIG__?.REACT_APP_API_URL || "https://fallback-url.com";
 console.log("API URL:", apiUrl);
+
+[HttpGet]
+public IActionResult GetConfig()
+{
+    var envVariables = System.Environment.GetEnvironmentVariables();
+    var configDictionary = envVariables
+        .Cast<System.Collections.DictionaryEntry>()
+        .ToDictionary(entry => entry.Key.ToString(), entry => entry.Value.ToString());
+
+    return Ok(configDictionary);
+}
