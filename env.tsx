@@ -21,7 +21,13 @@ public class ConfigurationController : ControllerBase
 }
 
 
+async function fetchConfig() {
+  const response = await fetch("/api/config");
+  const config = await response.json();
+  console.log("Config:", config);
+}
 
+fetchConfig();
 
 
 async function loadConfig() {
