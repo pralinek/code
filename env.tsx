@@ -1,15 +1,23 @@
-import fs from 'fs';
-import dotenv from 'dotenv';
-import path from 'path';
+declare global {
+  interface Window {
+    runtime_config?: Record<string, string>;
+  }
+}
 
-const envPath = path.resolve(__dirname, '../.env');
-const envConfig = dotenv.parse(fs.readFileSync(envPath));
+/**
+ * Extracts all variables from process.env and merges them with window.runtime_config
+ */
+export const getConfig = (): Record<string, string> => {
+  // Extract all process.env variables
+  const envVariables = Object.keys(process.env)
+    .reduce((acc, key) => {
+      acc[key] = process.env[key] || "";
+      return acc;
+    }, {} as Record<string, string>);
 
-const runtimeConfig = `
-window.runtime_config = ${JSON.stringify(envConfig, null, 2)};
-`;
-
-const outputPath = path.resolve(__dirname, '../public/runtime-config.js');
-fs.writeFileSync(outputPath, runtimeConfig);
-
-console.log("✅ Runtime config generated in public/runtime-config.js");
+  // Merge with window.runtime_config (which is injected at runtime)
+  return {
+    ...envVariables,
+    ...window.runtime_config,
+  };
+};
