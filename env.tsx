@@ -1,37 +1,37 @@
-var config = app.Configuration.AsEnumerable();
+import { useMutation } from "@tanstack/react-query";
 
-// Create a .env file content
-var envFile = new StringBuilder();
-foreach (var kvp in config)
-{
-    if (!string.IsNullOrEmpty(kvp.Value)) // Ignore null values
-    {
-        envFile.AppendLine($"REACT_APP_{kvp.Key.Replace(":", "_").ToUpper()}={kvp.Value}");
-    }
+const deleteItem = async (id) => {
+  await fetch(`/api/items/${id}`, { method: "DELETE" });
+};
+
+export function useDeleteItem(refetch) {
+  return useMutation({
+    mutationFn: deleteItem,
+    onSuccess: () => {
+      refetch(); // Refresh the data after deletion
+    },
+  });
 }
 
-// Write to ClientApp/.env before building React
-File.WriteAllText("ClientApp/.env", envFile.ToString());
 
 
-var envVariables = Environment.GetEnvironmentVariables();
-var envFileContent = new StringBuilder();
 
-foreach (DictionaryEntry envVar in envVariables)
-{
-    string key = envVar.Key.ToString();
-    string value = envVar.Value.ToString();
-
-    if (!string.IsNullOrEmpty(value))
-    {
-        // Prefix with REACT_APP_ (React only recognizes prefixed env variables)
-        string formattedKey = $"REACT_APP_{key.ToUpper()}";
-        envFileContent.AppendLine($"{formattedKey}={value}");
-    }
-}
-
-// Write the environment variables to ClientApp/.env
-string envFilePath = Path.Combine("ClientApp", ".env");
-File.WriteAllText(envFilePath, envFileContent.ToString());
-
-Console.WriteLine($".env file generated at: {envFilePath}");
+export default function ItemList() {
+    const { data: items, refetch } = useQuery({
+      queryKey: ["items"],
+      queryFn: () => fetch("/api/items").then((res) => res.json()),
+    });
+  
+    const { mutate: deleteItem } = useDeleteItem(refetch);
+  
+    return (
+      <ul>
+        {items?.map((item) => (
+          <li key={item.id}>
+            {item.name}
+            <button onClick={() => deleteItem(item.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
